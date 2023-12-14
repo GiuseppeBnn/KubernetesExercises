@@ -8,6 +8,7 @@ sudo swapoff -a
 echo "Removing old configuration files ..."
 sudo rm -f /etc/kubernetes/manifests/kube-apiserver.yaml /etc/kubernetes/manifests/kube-controller-manager.yaml /etc/kubernetes/manifests/kube-scheduler.yaml /etc/kubernetes/manifests/etcd.yaml
 sudo rm -rf /var/lib/etcd
+sudo rm -rf ${HOME}/.kube
 
 read -p "Enter the correct IP and subnet mask of the current LAN (example: 192.168.0.0/16): " LAN_SUBNET
 echo "Initializing kubeadm ..."
