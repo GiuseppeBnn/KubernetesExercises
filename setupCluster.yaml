@@ -1,0 +1,59 @@
+---
+- name: Install Kubernetes Cluster
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Docker on Debian based systems
+      apt:
+        name: docker.io
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install Docker on Arch Linux based systems
+      pacman:
+        name: docker
+        state: present
+      when: ansible_os_family == "Archlinux"
+
+    - name: Install docker-compose on Debian based systems
+      apt:
+        name: docker-compose
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install docker-compose on Arch Linux based systems
+      pacman:
+        name: docker-compose
+        state: present
+      when: ansible_os_family == "Archlinux"
+
+    - name: Add Kubernetes signing key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Add Kubernetes repository
+      apt_repository:
+        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install Kubernetes on Debian based systems
+      apt:
+        name:
+          - kubeadm
+          - kubectl
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure installKubeArch.sh is executable
+      file:
+        path: installKubeArch.sh
+        mode: '0755'
+
+    - name: Run custom script to install Kubernetes on Arch based systems
+      script: installKubeArch.sh
+      when: ansible_os_family == "Archlinux"
+      
