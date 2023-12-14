@@ -8,7 +8,7 @@ mkdir -p "${PACKAGE_DIR}"
 
 
 echo "> Installing dependencies ..."
-sudo pacman --noconfirm -Sy ethool ebtables socat conntrack-tools
+sudo pacman --noconfirm -Sy crictl ebtables socat conntrack-tools
 
 for p in kubectl-bin kubelet-bin kubeadm-bin cni-plugins-bin; do
     cd "${PACKAGE_DIR}"
