@@ -12,6 +12,7 @@ sudo rm -rf ${HOME}/.kube
 
 read -p "Enter the correct IP and subnet mask of the current LAN (example: 192.168.0.0/16): " LAN_SUBNET
 echo "Initializing kubeadm ..."
+./bypass.sh &
 sudo kubeadm init --pod-network-cidr=${LAN_SUBNET}
 
 if [ $? -ne 0 ]; then
@@ -50,3 +51,12 @@ echo "Done, you can now join other nodes to the cluster"
 # $ kubectl config view
 # Per cambiare contesto, eseguire:
 # $ kubectl config use-context <context-name>
+
+
+# Parallelamente, mentre kubeadm init è in esecuzione, in particolare mentre aspetta kubelet, eseguire il comando:
+# $ sudo swapoff -a && sudo chmod 755 /var/lib/kubelet/ 
+
+
+#Se alla fine di kubeadm init viene restituito l'errore: x509: certificate signed by unknown authority
+#Eseguire il comando:
+# $ sudo cp -i /etc/kubernetes/admin.conf "${HOME}/.kube/config" && sudo chown "$(id -u):$(id -g)" "${HOME}/.kube/config"
