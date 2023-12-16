@@ -11,7 +11,8 @@ fi
 args=("$@")
 
 
-
+rm -f inventory.ini
+touch inventory.ini
 echo "[worker]" >> inventory.ini
 # Loop sugli argomenti, saltando il primo
 for ((i = 1; i < $#; i+=2)); do
