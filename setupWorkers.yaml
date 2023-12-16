@@ -48,12 +48,24 @@
         state: present
       when: ansible_os_family == "Debian"
 
+    - name: Copy installKubeArch.sh to remote
+      copy:
+        src: "{{ playbook_dir }}/installKubeArch.sh"
+        dest: "/tmp/installKubeArch.sh"
+        mode: '0755'
+
     - name: Ensure installKubeArch.sh is executable
       file:
-        path: installKubeArch.sh
+        path: "/tmp/installKubeArch.sh"
         mode: '0755'
 
     - name: Run custom script to install Kubernetes on Arch based systems
-      script: installKubeArch.sh
+      shell: "bash -l -c '/tmp/installKubeArch.sh'"
+      become: no
+      register: script_output
       when: ansible_os_family == "Archlinux"
-      
+
+    - name: Print script output
+      debug:
+        var: script_output.stdout_lines
+      when: ansible_os_family == "Archlinux"

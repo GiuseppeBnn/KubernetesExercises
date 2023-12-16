@@ -1,0 +1,39 @@
+---
+- name: Init Kubernetes Workers
+  hosts: all
+  become: true
+  tasks:
+    - name: disable swap
+      command: swapoff -a
+      ignore_errors: true
+      when: ansible_swaptotal_mb > 0 and ansible_swaptotal_mb is defined
+
+    - name: disable swap permanently
+      lineinfile:
+        path: /etc/fstab
+        regexp: '^/swapfile'
+        state: absent
+      when: ansible_swaptotal_mb > 0 and ansible_swaptotal_mb is defined  
+
+    - name: kubeadm reset
+      command: kubeadm reset -f
+      ignore_errors: true
+
+    - name: copy join command
+      copy:
+        src: "{{ playbook_dir }}/join_command.sh"
+        dest: "/tmp/join_command.sh"
+        mode: '0755'
+
+    - name: run join command
+      shell: /tmp/join_command.sh
+      become: true  
+      register: join_result
+      ignore_errors: true    
+
+    - name: output join command
+      debug:
+        msg: "{{ join_resultcommand }}"
+      when: join_result is defined
+  
+      
