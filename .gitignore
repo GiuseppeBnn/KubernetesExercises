@@ -1,3 +1,4 @@
 inventory.ini
 join_command.sh
 kubeadm-init.txt
+.vscode/
