@@ -1,7 +1,21 @@
 #!/bin/bash
+
+# Controlla se lo script non è stato avviato con sudo
+if [ "$EUID" -eq 0 ]; then
+    echo "Errore: questo script non deve essere avviato con sudo."
+    exit 1
+fi
+
+
 H=$HOME
 ID=$(id -u)
 IDG=$(id -g)
+
+# Controlla se ansible è installato
+if ! command -v ansible &>/dev/null; then
+    echo "Errore: ansible non è installato."
+    exit 1
+fi
 
 # Controlla se ci sono argomenti
 if [ "$#" -lt 2 ]; then
@@ -9,8 +23,36 @@ if [ "$#" -lt 2 ]; then
     echo "Uso: $0 <subnet> [<hostname_worker1> <IP_worker1> <hostname_worker2> <IP_worker2...]"
     exit 1
 fi
+#TODO: testings of this part of code
+##Controlla se docker è installato, nel caso lo installa (controllando la distribuzione e se è presente la repository)  
+#if ! command -v docker &>/dev/null; then
+#    echo "Docker non è installato, procedo con l'installazione..."
+#    if [ -f /etc/os-release ]; then
+#        . /etc/os-release
+#        OS=$NAME
+#        VER=$VERSION_ID
+#    else
+#        echo "Errore: non è stato possibile rilevare la distribuzione."
+#        exit 1
+#    fi
+#    if [ "$OS" == "Ubuntu" ]; then
+#        sudo apt-get update
+#        sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+#        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+#        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+#        sudo apt-get update
+#        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+#    elif [ "$OS" == "Arch Linux" ]; then
+#        sudo pacman -Syu --noconfirm docker
+#        sudo systemctl enable docker.service
+#        sudo systemctl start docker.service
+#    else
+#        echo "Errore: distribuzione non supportata."
+#        exit 1
+#    fi
+#fi
 
-# Memorizza gli argomenti in un array
+
 args=("$@")
 
 rm -f inventory.ini
@@ -67,7 +109,6 @@ rm -f join_command.sh
 echo "#!/bin/bash" >>join_command.sh
 echo "$join_command" >>join_command.sh
 chmod +x join_command.sh
-exit 0  #debug exit
 read -p "Vuoi installare prima docker e poi kubernetes nei worker? [s/n] "
 echo
 if [ "$REPLY" == "s" -o "$REPLY" == "S" ]; then

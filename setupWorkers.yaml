@@ -45,6 +45,7 @@
         name:
           - kubeadm
           - kubectl
+          - kubelet
         state: present
       when: ansible_os_family == "Debian"
 
@@ -53,12 +54,14 @@
         src: "{{ playbook_dir }}/installKubeArch.sh"
         dest: "/tmp/installKubeArch.sh"
         mode: '0755'
+      when: ansible_os_family == "Archlinux"  
 
     - name: Ensure installKubeArch.sh is executable
       file:
         path: "/tmp/installKubeArch.sh"
         mode: '0755'
-
+      when: ansible_os_family == "Archlinux"
+      
     - name: Run custom script to install Kubernetes on Arch based systems
       shell: "bash -l -c '/tmp/installKubeArch.sh'"
       become: no
